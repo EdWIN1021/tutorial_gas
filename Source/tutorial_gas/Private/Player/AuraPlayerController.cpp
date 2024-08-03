@@ -7,48 +7,53 @@
 
 AAuraPlayerController::AAuraPlayerController()
 {
-  bReplicates = false;
+	bReplicates = false;
 }
 
 
 void AAuraPlayerController::BeginPlay()
 {
-  Super::BeginPlay();
-  check(AuraContext);
+	Super::BeginPlay();
 
-  UEnhancedInputLocalPlayerSubsystem* Subsystem =  ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-  check(Subsystem);
+	// it will crash if the AuraContext is null
+	check(AuraContext);
 
-  Subsystem->AddMappingContext(AuraContext, 0); 
+	// Singleton 
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer());
+	check(Subsystem);
+	Subsystem->AddMappingContext(AuraContext, 0);
 
-  bShowMouseCursor = true;
-  DefaultMouseCursor = EMouseCursor::Default;
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
 
-  FInputModeGameAndUI InputModeData;
-  InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-  InputModeData.SetHideCursorDuringCapture(false);
-  SetInputMode(InputModeData);
+	// cursor behavior
+	FInputModeGameAndUI InputModeData;
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputModeData.SetHideCursorDuringCapture(false);
+	SetInputMode(InputModeData);
 }
+
 void AAuraPlayerController::SetupInputComponent()
 {
-  Super::SetupInputComponent();
+	Super::SetupInputComponent();
 
-  UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-  EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
 }
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
-  const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
-  const FRotator Rotation = GetControlRotation();
-  const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-  const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-  const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-  if(APawn* ControlledPawn =  GetPawn<APawn>())
-  {
-    ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
-    ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
-  } 
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
+		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
+	}
 }

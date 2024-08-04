@@ -4,14 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Character/AuraCharacter.h"
+#include "Interaction/EnemyInterface.h"
 #include "AuraEnemy.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TUTORIAL_GAS_API AAuraEnemy : public AAuraCharacter
+class TUTORIAL_GAS_API AAuraEnemy : public AAuraCharacter, public IEnemyInterface
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void HighlightActor() override;
+	virtual void UnHighlightActor() override;
 };

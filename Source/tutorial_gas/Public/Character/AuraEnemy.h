@@ -18,4 +18,7 @@ class TUTORIAL_GAS_API AAuraEnemy : public AAuraCharacter, public IEnemyInterfac
 public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool bHighlighted = false;
 };
